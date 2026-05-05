@@ -53,13 +53,13 @@ if uploaded is not None:
         confidence = score * 100
     else:
         st.success("✅ No Tumor Detected")
-            confidence = (1 - score) * 100
+        confidence = (1 - score) * 100
         st.metric("Confidence", f"{confidence:.1f}%")
         st.progress(float(confidence / 100))
         st.divider()
     if score > 0.5:
         st.warning("⚠️ Please consult a doctor immediately.")
     else:
-         st.info("✅ Stay healthy!")
+        st.info("✅ Stay healthy!")
 
 st.caption("⚠️ For educational purposes only.")
