@@ -6,14 +6,13 @@ import gdown
 import os
 
 st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="centered")
-
 # ✅ Auto download model from Google Drive
 @st.cache_resource
 def load_model():
     if not os.path.exists('brain_tumor_model.h5'):
-        with st.spinner("Downloading model... please wait"):
+        with st.spinner("Downloading model... please wait ⏳"):
             gdown.download(
-                'https://drive.google.com/uc?id=1y-rbKy63uxRosSV5Ci8CMJ1nCcDMpJLn',  
+                'https://drive.google.com/uc?id=1keT2gNBV5wQ7_MX4CT7j1JMbnUvlW2iW',
                 'brain_tumor_model.h5',
                 quiet=False
             )
@@ -39,6 +38,7 @@ if uploaded is not None:
     if not is_likely_mri(img):
         st.error("❌ Not a valid MRI scan. Please upload a brain MRI image.")
         st.stop()
+
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("📷 Uploaded MRI")
@@ -48,18 +48,18 @@ if uploaded is not None:
         with st.spinner("Analyzing..."):
             arr = preprocess(img)
             score = model.predict(arr)[0][0]
-        if score > 0.5:
-            st.error("⚠️ Tumor Detected")
-            confidence = score * 100
-        else: 
-          st.success("✅ No Tumor Detected")
-          confidence = (1 - score) * 100
-          st.metric("Confidence", f"{confidence:.1f}%")
+    if score > 0.5:
+        st.error("⚠️ Tumor Detected")
+        confidence = score * 100
+    else:
+        st.success("✅ No Tumor Detected")
+            confidence = (1 - score) * 100
+        st.metric("Confidence", f"{confidence:.1f}%")
         st.progress(float(confidence / 100))
         st.divider()
-        if score > 0.5:
-            st.warning("⚠️ Please consult a doctor immediately.")
-        else:
-            st.info("✅ Stay healthy!")
+    if score > 0.5:
+        st.warning("⚠️ Please consult a doctor immediately.")
+    else:
+         st.info("✅ Stay healthy!")
 
 st.caption("⚠️ For educational purposes only.")
