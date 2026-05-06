@@ -3,20 +3,30 @@ import gdown
 import numpy as np
 from PIL import Image
 import streamlit as st
+import tensorflow as tf
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, Dropout, GlobalAveragePooling2D
 
 st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="centered")
 
 @st.cache_resource
 def load_model():
-    if not os.path.exists('brain_tumor_final.h5'):
-        with st.spinner("Downloading model... ⏳"):
+    if not os.path.exists('brain_tumor.weights.h5'):
+        with st.spinner("Downloading model weights... ⏳"):
             gdown.download(
-                'https://drive.google.com/uc?id=1SwVsN17Tv1t5pTB2GGzpawRfRcndrT5k',
-                'brain_tumor_final.h5',
+                'https://drive.google.com/uc?id=1ymkI6ST7stQ6vtwGVSqI8OAoyR4JysmD',
+                'brain_tumor.weights.h5',
                 quiet=False
             )
-    import tf_keras as keras
-    return keras.models.load_model('brain_tumor_final.h5')
+    base_model = VGG16(weights=None, include_top=False, input_shape=(224, 224, 3))
+    x = GlobalAveragePooling2D()(base_model.output)
+    x = Dense(256, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    output = Dense(1, activation='sigmoid')(x)
+    model = Model(inputs=base_model.input, outputs=output)
+    model.load_weights('brain_tumor.weights.h5')
+    return model
 
 model = load_model()
 
