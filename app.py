@@ -1,23 +1,22 @@
-import streamlit as st
-import tensorflow as tf
+import os
+import gdown
 import numpy as np
 from PIL import Image
-import gdown
-import os
+import streamlit as st
 
-st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="centered")
 st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="centered")
 
 @st.cache_resource
 def load_model():
-    if not os.path.exists('brain_tumor_model.keras'):
+    if not os.path.exists('brain_tumor_final.h5'):
         with st.spinner("Downloading model... ⏳"):
             gdown.download(
-                'https://drive.google.com/uc?id=1r-e_Nx0_FHEFpKctrBoiawPQEPIQkqCG',
-                'brain_tumor_model.keras',
+                'https://drive.google.com/uc?id=1SwVsN17Tv1t5pTB2GGzpawRfRcndrT5k',
+                'brain_tumor_final.h5',
                 quiet=False
             )
-    return tf.keras.models.load_model('brain_tumor_model.keras')
+    import tf_keras as keras
+    return keras.models.load_model('brain_tumor_final.h5')
 
 model = load_model()
 
@@ -41,7 +40,6 @@ if uploaded is not None:
     if not is_likely_mri(img):
         st.error("❌ Not a valid MRI scan. Please upload a brain MRI image.")
         st.stop()
-
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("📷 Uploaded MRI")
@@ -51,18 +49,18 @@ if uploaded is not None:
         with st.spinner("Analyzing..."):
             arr = preprocess(img)
             score = model.predict(arr)[0][0]
-if score > 0.5:
-    st.error("⚠️ Tumor Detected")
-    confidence = score * 100
-else:
-    st.success("✅ No Tumor Detected")
-    confidence = (1 - score) * 100
-    st.metric("Confidence", f"{confidence:.1f}%")
-    st.progress(float(confidence / 100))
-    st.divider()
-if score > 0.5:
-    st.warning("⚠️ Please consult a doctor immediately.")
-else:
-    st.info("✅ Stay healthy!")
+        if score > 0.5:
+            st.error("⚠️ Tumor Detected")
+            confidence = score * 100
+        else:
+            st.success("✅ No Tumor Detected")
+            confidence = (1 - score) * 100
+        st.metric("Confidence", f"{confidence:.1f}%")
+        st.progress(float(confidence / 100))
+        st.divider()
+        if score > 0.5:
+            st.warning("⚠️ Please consult a doctor immediately.")
+        else:
+            st.info("✅ Stay healthy!")
 
 st.caption("⚠️ For educational purposes only.")
