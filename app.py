@@ -46,18 +46,19 @@ with col2:
 with st.spinner("Analyzing..."):
     arr = preprocess(img)
     score = model.predict(arr)[0][0]
+    
     if score > 0.5:
         st.error("⚠️ Tumor Detected")
         confidence = score * 100
-     else:
-         st.success("✅ No Tumor Detected")
-         confidence = (1 - score) * 100
-         st.metric("Confidence", f"{confidence:.1f}%")
-         st.progress(float(confidence / 100))
-         st.divider()
-      if score > 0.5:
-          st.warning("⚠️ Please consult a doctor immediately.")
-      else:
-          st.info("✅ Stay healthy!")
+    else:
+        st.success("✅ No Tumor Detected")
+        confidence = (1 - score) * 100
+        st.metric("Confidence", f"{confidence:.1f}%")
+        st.progress(float(confidence / 100))
+        st.divider()
+        if score > 0.5:
+            st.warning("⚠️ Please consult a doctor immediately.")
+        else:
+            st.info("✅ Stay healthy!")
 
 st.caption("⚠️ For educational purposes only.")
