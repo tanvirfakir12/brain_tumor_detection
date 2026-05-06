@@ -3,4 +3,5 @@ numpy
 Pillow
 opencv-python-headless
 gdown
-tensorflow==2.18.0
+tf-keras
+tensorflow-cpu==2.17.0
